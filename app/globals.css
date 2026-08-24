@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FEFEFE;
+  --surface: #FFFFFF;
+  --foreground: #16161E;
+  --muted: #6B7280;
+  --border: #E7E9EF;
+  --primary: #035AF7;
+}
+
+.dark {
+  --background: #0B1020;
+  --surface: #111827;
+  --foreground: #F8FAFC;
+  --muted: #94A3B8;
+  --border: #1F2A44;
+  --primary: #2F7BFF;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background: #02A1FC;
+  color: #FEFEFE;
+}
+
+:focus-visible {
+  outline: 2px solid #035AF7;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dark :focus-visible {
+  outline-color: #4FD0FA;
+}
+
+/* subtle scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Marquee (auto-scrolling strips: brands, etc.) ---- */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes marquee-x-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+[dir="rtl"] .animate-marquee {
+  animation-name: marquee-x-rtl;
+}
+.marquee-track:hover .animate-marquee,
+.marquee-track:focus-within .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* ---- Hero 3D card stack ---- */
+@keyframes float-card-1 {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50% { transform: translateY(-14px) rotate(-6deg); }
+}
+@keyframes float-card-2 {
+  0%, 100% { transform: translateY(0) rotate(6deg); }
+  50% { transform: translateY(-10px) rotate(8deg); }
+}
+@keyframes float-card-3 {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-18px) rotate(-1deg); }
+}
+@keyframes orb-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(18px, -22px) scale(1.08); }
+}
+@keyframes orb-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-16px, 16px) scale(0.94); }
+}
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.animate-float-card-1 { animation: float-card-1 6s ease-in-out infinite; }
+.animate-float-card-2 { animation: float-card-2 7s ease-in-out infinite; }
+.animate-float-card-3 { animation: float-card-3 5.5s ease-in-out infinite; }
+.animate-orb-drift-1 { animation: orb-drift-1 9s ease-in-out infinite; }
+.animate-orb-drift-2 { animation: orb-drift-2 11s ease-in-out infinite; }
+.animate-sparkle { animation: sparkle-pulse 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+  .animate-float-card-1,
+  .animate-float-card-2,
+  .animate-float-card-3,
+  .animate-orb-drift-1,
+  .animate-orb-drift-2,
+  .animate-sparkle {
+    animation: none;
+  }
+}
