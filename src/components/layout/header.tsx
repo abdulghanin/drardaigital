@@ -13,7 +13,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const links = [
     { href: `/${locale}`, label: dict.nav.home },
     { href: `/${locale}/gift-cards`, label: dict.nav.giftCards },
-    { href: `/${locale}/gift-cards`, label: dict.nav.categories },
+    { href: `/${locale}/categories`, label: dict.nav.categories },
     { href: `/${locale}/offers`, label: dict.nav.offers },
     { href: `/${locale}/business`, label: dict.nav.business },
   ];
