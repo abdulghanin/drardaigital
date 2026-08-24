@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { SearchBar } from "@/components/layout/search-bar";
 import { HeroVisual3D } from "./hero-visual-3d";
 import type { Dictionary } from "@/lib/dictionaries";
 import type { Locale } from "@/types";
@@ -67,12 +66,8 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             {dict.hero.description}
           </motion.p>
 
-          <motion.div custom={0.24} initial="hidden" animate="visible" variants={fadeUp} className="mt-7 max-w-lg">
-            <SearchBar locale={locale} placeholder={dict.header.search} variant="hero" />
-          </motion.div>
-
           <motion.div
-            custom={0.32}
+            custom={0.24}
             initial="hidden"
             animate="visible"
             variants={fadeUp}
