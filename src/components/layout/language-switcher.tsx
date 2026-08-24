@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Languages } from "lucide-react";
 import type { Locale } from "@/types";
 
 export function LanguageSwitcher({ locale }: { locale: Locale }) {
@@ -12,12 +13,11 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
   return (
     <Link
       href={`/${other}/${rest}`}
-      className="flex h-10 items-center gap-1 rounded-full px-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface"
-      aria-label="Switch language"
+      className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface"
+      aria-label={locale === "ar" ? "Switch to English" : "التبديل إلى العربية"}
+      title={locale === "ar" ? "English" : "العربية"}
     >
-      <span className={locale === "ar" ? "text-dara-blue" : "text-muted"}>AR</span>
-      <span className="text-muted">|</span>
-      <span className={locale === "en" ? "text-dara-blue" : "text-muted"}>EN</span>
+      <Languages className="h-4 w-4 text-dara-blue" aria-hidden="true" />
     </Link>
   );
 }
