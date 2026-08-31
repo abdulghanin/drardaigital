@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Logo } from "./logo";
 import { SearchBar } from "./search-bar";
 import { LanguageSwitcher } from "./language-switcher";
@@ -51,12 +51,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             <ShoppingCart className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
             <CartCount />
           </Link>
-          <button
-            aria-label={dict.header.account}
-            className="hidden h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-surface sm:flex"
-          >
-            <User className="h-5 w-5" />
-          </button>
+         
         </div>
       </div>
       <div className="border-t border-border px-3 py-2.5 sm:px-4 md:hidden">

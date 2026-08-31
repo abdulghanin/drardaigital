@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { Check, CreditCard, Gift, User } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { saveCompletedOrder } from "@/lib/order-store";
@@ -11,20 +13,25 @@ import { getGiftCardById } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ShoppingCart } from "lucide-react";
+import { StripePaymentForm } from "./stripe-payment-form";
 import type { Locale } from "@/types";
 import type { Dictionary } from "@/lib/dictionaries";
 
 type Step = 1 | 2 | 3;
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 export function CheckoutFlow({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const { lines, clearCart } = useCart();
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
   const [gift, setGift] = useState({ recipientEmail: "", message: "" });
-  const [payment, setPayment] = useState({ cardNumber: "", expiry: "", cvv: "", name: "" });
 
   const total = useMemo(
     () => lines.reduce((sum, l) => sum + l.amount * l.quantity, 0),
@@ -39,11 +46,30 @@ export function CheckoutFlow({ locale, dict }: { locale: Locale; dict: Dictionar
 
   const canProceedStep1 = customer.name.trim() && customer.email.trim();
   const canProceedStep2 = gift.recipientEmail.trim();
-  const canPlaceOrder =
-    payment.cardNumber.trim().length >= 12 && payment.expiry.trim() && payment.cvv.trim() && payment.name.trim();
 
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
+
+  useEffect(() => {
+    if (step !== 3 || clientSecret || !hydrated || !stripePromise || lines.length === 0) return;
+
+    const createPaymentIntent = async () => {
+      setError("");
+      const response = await fetch("/api/stripe/payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lines, customerEmail: customer.email, customerName: customer.name }),
+      });
+      const result = (await response.json()) as { clientSecret?: string; error?: string };
+      if (!response.ok || !result.clientSecret) throw new Error(result.error || "Unable to start payment.");
+      setClientSecret(result.clientSecret);
+    };
+
+    setSubmitting(true);
+    createPaymentIntent()
+      .catch((paymentError: Error) => setError(paymentError.message))
+      .finally(() => setSubmitting(false));
+  }, [clientSecret, customer.email, customer.name, hydrated, lines, step]);
 
   if (hydrated && lines.length === 0) {
     return (
@@ -60,18 +86,10 @@ export function CheckoutFlow({ locale, dict }: { locale: Locale; dict: Dictionar
     );
   }
 
-  const handlePlaceOrder = () => {
-    setSubmitting(true);
-    setTimeout(() => {
-      saveCompletedOrder({
-        lines,
-        total,
-        customerName: customer.name,
-        customerEmail: customer.email,
-      });
-      clearCart();
-      router.push(`/${locale}/order-success`);
-    }, 900);
+  const handlePaymentSuccess = () => {
+    saveCompletedOrder({ lines, total, customerName: customer.name, customerEmail: customer.email });
+    clearCart();
+    router.push(`/${locale}/order-success`);
   };
 
   return (
@@ -160,47 +178,38 @@ export function CheckoutFlow({ locale, dict }: { locale: Locale; dict: Dictionar
 
           {step === 3 && (
             <div className="space-y-4">
-              <Field label={dict.checkout.cardNumber}>
-                <input
-                  inputMode="numeric"
-                  value={payment.cardNumber}
-                  onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
-                  placeholder="4242 4242 4242 4242"
-                  className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm focus:border-dara-blue focus:outline-none"
-                />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label={dict.checkout.expiry}>
-                  <input
-                    value={payment.expiry}
-                    onChange={(e) => setPayment({ ...payment, expiry: e.target.value })}
-                    placeholder="MM/YY"
-                    className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm focus:border-dara-blue focus:outline-none"
+              {clientSecret && stripePromise ? (
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    clientSecret,
+                    appearance: {
+                      theme: "stripe",
+                      variables: {
+                        colorPrimary: "#1769e0",
+                        colorBackground: "#ffffff",
+                        colorText: "#172033",
+                        borderRadius: "12px",
+                        fontFamily: "inherit",
+                      },
+                    },
+                  }}
+                >
+                  <StripePaymentForm
+                    locale={locale}
+                    dict={dict}
+                    submitting={submitting}
+                    onSuccess={handlePaymentSuccess}
+                    onError={setError}
                   />
-                </Field>
-                <Field label={dict.checkout.cvv}>
-                  <input
-                    value={payment.cvv}
-                    onChange={(e) => setPayment({ ...payment, cvv: e.target.value })}
-                    placeholder="123"
-                    className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm focus:border-dara-blue focus:outline-none"
-                  />
-                </Field>
-              </div>
-              <Field label={dict.checkout.nameOnCard}>
-                <input
-                  value={payment.name}
-                  onChange={(e) => setPayment({ ...payment, name: e.target.value })}
-                  className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm focus:border-dara-blue focus:outline-none"
-                />
-              </Field>
-              <p className="text-xs text-muted">{dict.checkout.securePayment}</p>
+                </Elements>
+              ) : (
+                <p className="text-sm text-muted">{error || dict.states.loading}</p>
+              )}
+              {error && !clientSecret && <p className="text-sm text-red-600" role="alert">{error}</p>}
               <div className="flex gap-2.5">
                 <Button variant="outline" className="w-1/3" onClick={() => setStep(2)}>
                   {dict.checkout.back}
-                </Button>
-                <Button className="flex-1" disabled={!canPlaceOrder || submitting} onClick={handlePlaceOrder}>
-                  {submitting ? dict.states.loading : dict.checkout.placeOrder}
                 </Button>
               </div>
             </div>

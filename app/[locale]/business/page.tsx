@@ -1,25 +1,61 @@
-import { Gift, Users, Heart, Repeat, Package, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  Gift,
+  Users,
+  Heart,
+  Repeat,
+  Package,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDictionary } from "@/lib/dictionaries";
 import type { Locale } from "@/lib/i18n-config";
 import type { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: { locale: Locale } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { locale: Locale };
+}): Promise<Metadata> {
   const dict = getDictionary(params.locale);
   return { title: dict.business.headline, description: dict.business.sub };
 }
 
-export default function BusinessPage({ params }: { params: { locale: Locale } }) {
+export default function BusinessPage({
+  params,
+}: {
+  params: { locale: Locale };
+}) {
   const { locale } = params;
   const dict = getDictionary(locale);
   const Arrow = locale === "ar" ? ArrowLeft : ArrowRight;
 
   const solutions = [
-    { icon: Gift, title: dict.business.corporateGifts, desc: dict.business.corporateGiftsDesc },
-    { icon: Users, title: dict.business.employeeRewards, desc: dict.business.employeeRewardsDesc },
-    { icon: Heart, title: dict.business.customerRewards, desc: dict.business.customerRewardsDesc },
-    { icon: Repeat, title: dict.business.loyaltyPrograms, desc: dict.business.loyaltyProgramsDesc },
-    { icon: Package, title: dict.business.bulkGiftCards, desc: dict.business.bulkGiftCardsDesc },
+    {
+      icon: Gift,
+      title: dict.business.corporateGifts,
+      desc: dict.business.corporateGiftsDesc,
+    },
+    {
+      icon: Users,
+      title: dict.business.employeeRewards,
+      desc: dict.business.employeeRewardsDesc,
+    },
+    {
+      icon: Heart,
+      title: dict.business.customerRewards,
+      desc: dict.business.customerRewardsDesc,
+    },
+    {
+      icon: Repeat,
+      title: dict.business.loyaltyPrograms,
+      desc: dict.business.loyaltyProgramsDesc,
+    },
+    {
+      icon: Package,
+      title: dict.business.bulkGiftCards,
+      desc: dict.business.bulkGiftCardsDesc,
+    },
   ];
 
   return (
@@ -33,10 +69,15 @@ export default function BusinessPage({ params }: { params: { locale: Locale } })
           <h1 className="font-display text-3xl font-extrabold leading-tight text-foreground sm:text-4xl lg:text-5xl">
             {dict.business.headline}
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">{dict.business.sub}</p>
-          <Button size="lg" className="mt-8 gap-2">
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+            {dict.business.sub}
+          </p>
+          <Button
+            size="lg"
+            className="mt-8 h-12 rounded-xl bg-dara-blue px-7 text-sm font-semibold text-white shadow-lg shadow-dara-blue/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-dara-blue/90 hover:shadow-xl hover:shadow-dara-blue/25 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-dara-blue focus-visible:ring-offset-2"
+          >
             {dict.business.contactUs}
-            <Arrow className="h-4 w-4" />
+            <Arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
           </Button>
         </div>
       </section>
@@ -53,7 +94,9 @@ export default function BusinessPage({ params }: { params: { locale: Locale } })
               <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-dara-blue/10 text-dara-blue">
                 <s.icon className="h-6 w-6" />
               </span>
-              <h3 className="mb-2 text-base font-bold text-foreground">{s.title}</h3>
+              <h3 className="mb-2 text-base font-bold text-foreground">
+                {s.title}
+              </h3>
               <p className="text-sm leading-relaxed text-muted">{s.desc}</p>
             </div>
           ))}
@@ -63,9 +106,17 @@ export default function BusinessPage({ params }: { params: { locale: Locale } })
       <section className="border-t border-border bg-surface">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-5 px-4 py-14 text-center sm:px-6 lg:px-8">
           <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">
-            {locale === "ar" ? "جاهزون لمكافأة فريقك أو عملائك؟" : "Ready to reward your team or customers?"}
+            {locale === "ar"
+              ? "جاهزون لمكافأة فريقك أو عملائك؟"
+              : "Ready to reward your team or customers?"}
           </h2>
-          <Button size="lg">{dict.business.contactUs}</Button>
+          <Button
+            size="lg"
+            className="group mt-8 h-12 rounded-xl bg-dara-blue px-8 text-sm font-semibold text-white shadow-lg shadow-dara-blue/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-dara-blue/90 hover:shadow-xl hover:shadow-dara-blue/25 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-dara-blue focus-visible:ring-offset-2"
+          >
+            {dict.business.contactUs}
+            <Arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+          </Button>
         </div>
       </section>
     </div>
